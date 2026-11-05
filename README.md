@@ -133,7 +133,13 @@ Existing output files are protected from replacement.
 
 The preserved take `20261105_165228` is 1.41 seconds at 100 Hz and has no valid
 Spine or Head data. It can demonstrate local playback but cannot supply a valid
-six-tracker retargeting take. Its older arrays remain preserved as legacy data.
+six-tracker retargeting take. Its original-rate `motion.npy` remains available.
+
+The older `motion_xyz_m.npy` visualization format (`frames, 6, 3`, XYZ in meters)
+is deprecated. Use `all_objects.csv` for local playback and `class/motion.npy`
+for the notebook. The existing XYZ-only file has been moved out of the capture
+folder to `.archive/deprecated_exports/20261105_165228/`. The viewer rejects this
+format with migration instructions. No active exporter creates it.
 
 ## Stream live motion
 
@@ -162,16 +168,8 @@ allow the chosen TCP port through the local firewall when streaming between PCs.
 is retained. The receiver exits on a stream timeout rather than replaying a stale
 pose indefinitely.
 
-## Verify offline
-
-```powershell
-python -m unittest discover -v
-```
-
-Tests cover capture finalization and recovery, tracker order and units, 120 Hz
-resampling, tracking loss and frame gaps, class export validation, playback, and a
-local ZeroMQ sender/receiver connection. Actual camera capture must be checked in
-the lab with Evoke and all six trackers active.
+Actual camera capture must be checked in the lab with Evoke and all six trackers
+active. Use the local viewer to review tracking quality before using a class export.
 
 Duplicate transfer scripts and the old synthetic preview are retained in
 `.archive/`. The active scripts live only at the project root.

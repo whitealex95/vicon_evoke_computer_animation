@@ -21,6 +21,13 @@ TRACKER_SUFFIXES = ("Spine", "RightFoot", "RightHand", "LeftFoot", "Head", "Left
 
 def load_npy(path, fps):
     """Read the P5_Twister (frame, tracker, XYZ-mm + occlusion) format."""
+    data = np.load(path, allow_pickle=False)
+    if data.ndim == 3 and data.shape[1:] == (6, 3):
+        raise ValueError("The XYZ-only visualization format (shape frames, 6, 3; meters) is deprecated. "
+                         "Use all_objects.csv for local playback or class/motion.npy for the course notebook. "
+                         "Regenerate from the CSV with export_evoke_npy.py --class-ready.")
+    if data.ndim != 3 or data.shape[1:] != (6, 4) or not len(data):
+        raise ValueError("Expected nonempty NPY with shape (frames, 6, 4): XYZ mm, occluded_flag")
     sidecar = Path(path).with_suffix(".json")
     if fps is None and sidecar.is_file():
         metadata = json.loads(sidecar.read_text(encoding="utf-8"))
@@ -28,9 +35,6 @@ def load_npy(path, fps):
             fps = metadata["frame_rate_hz"]
     if fps is None or not np.isfinite(fps) or fps <= 0:
         raise ValueError("NPY has no timestamps; supply --fps with the capture frame rate")
-    data = np.load(path, allow_pickle=False)
-    if data.ndim != 3 or data.shape[1:] != (6, 4) or not len(data):
-        raise ValueError("Expected nonempty NPY with shape (frames, 6, 4): XYZ mm, occluded_flag")
     if data.dtype.kind not in "fiu" or not np.isin(data[:, :, 3], [0, 1]).all():
         raise ValueError("Expected numeric NPY with occlusion flags 0 or 1")
     entities = {}
