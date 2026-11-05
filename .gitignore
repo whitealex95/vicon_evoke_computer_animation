@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+record_exports/
+.archive/
+recording_preview.png
